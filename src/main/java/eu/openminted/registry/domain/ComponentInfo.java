@@ -20,7 +20,13 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent&gt;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *       &lt;sequence&gt;
- *         &lt;element name="resourceType" type="{http://www.w3.org/2001/XMLSchema}string"/&gt;
+ *         &lt;element name="resourceType"&gt;
+ *           &lt;simpleType&gt;
+ *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
+ *               &lt;enumeration value="component"/&gt;
+ *             &lt;/restriction&gt;
+ *           &lt;/simpleType&gt;
+ *         &lt;/element&gt;
  *         &lt;element ref="{http://www.meta-share.org/OMTD-SHARE_XMLSchema}identificationInfo"/&gt;
  *         &lt;element ref="{http://www.meta-share.org/OMTD-SHARE_XMLSchema}contactInfo"/&gt;
  *         &lt;element ref="{http://www.meta-share.org/OMTD-SHARE_XMLSchema}versionInfo" minOccurs="0"/&gt;
@@ -122,12 +128,24 @@ import javax.xml.bind.annotation.XmlType;
  *             &lt;/complexContent&gt;
  *           &lt;/complexType&gt;
  *         &lt;/element&gt;
+ *         &lt;element name="application" type="{http://www.w3.org/2001/XMLSchema}boolean" minOccurs="0"/&gt;
  *         &lt;element name="distributionInfos"&gt;
  *           &lt;complexType&gt;
  *             &lt;complexContent&gt;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
  *                 &lt;sequence&gt;
  *                   &lt;element ref="{http://www.meta-share.org/OMTD-SHARE_XMLSchema}componentDistributionInfo" maxOccurs="unbounded"/&gt;
+ *                 &lt;/sequence&gt;
+ *               &lt;/restriction&gt;
+ *             &lt;/complexContent&gt;
+ *           &lt;/complexType&gt;
+ *         &lt;/element&gt;
+ *         &lt;element name="parameterInfos" minOccurs="0"&gt;
+ *           &lt;complexType&gt;
+ *             &lt;complexContent&gt;
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType"&gt;
+ *                 &lt;sequence&gt;
+ *                   &lt;element ref="{http://www.meta-share.org/OMTD-SHARE_XMLSchema}parameterInfo" maxOccurs="unbounded" minOccurs="0"/&gt;
  *                 &lt;/sequence&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -174,19 +192,7 @@ import javax.xml.bind.annotation.XmlType;
  *                       &lt;/complexContent&gt;
  *                     &lt;/complexType&gt;
  *                   &lt;/element&gt;
- *                   &lt;element name="requiresHardware" maxOccurs="unbounded" minOccurs="0"&gt;
- *                     &lt;simpleType&gt;
- *                       &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string"&gt;
- *                         &lt;maxLength value="100"/&gt;
- *                         &lt;enumeration value="graphicCard"/&gt;
- *                         &lt;enumeration value="microphone"/&gt;
- *                         &lt;enumeration value="ocrSystem"/&gt;
- *                         &lt;enumeration value="specialHardwareEquipment"/&gt;
- *                         &lt;enumeration value="none"/&gt;
- *                         &lt;enumeration value="other"/&gt;
- *                       &lt;/restriction&gt;
- *                     &lt;/simpleType&gt;
- *                   &lt;/element&gt;
+ *                   &lt;element ref="{http://www.meta-share.org/OMTD-SHARE_XMLSchema}requiresHardware" maxOccurs="unbounded" minOccurs="0"/&gt;
  *                 &lt;/sequence&gt;
  *               &lt;/restriction&gt;
  *             &lt;/complexContent&gt;
@@ -214,7 +220,9 @@ import javax.xml.bind.annotation.XmlType;
     "resourceDocumentationInfo",
     "resourceCreationInfo",
     "componentTypes",
+    "application",
     "distributionInfos",
+    "parameterInfos",
     "inputContentResourceInfo",
     "outputResourceInfo",
     "componentDependencies",
@@ -225,7 +233,7 @@ import javax.xml.bind.annotation.XmlType;
 public class ComponentInfo {
 
     @XmlElement(required = true)
-    protected String resourceType;
+    protected ResourceTypeEnum resourceType;
     @XmlElement(required = true)
     protected IdentificationInfo identificationInfo;
     @XmlElement(required = true)
@@ -240,9 +248,13 @@ public class ComponentInfo {
     @XmlElementWrapper(required = true)
     @XmlElement(name = "componentType", namespace = "http://www.meta-share.org/OMTD-SHARE_XMLSchema")
     protected List<ComponentTypeEnum> componentTypes;
+    protected Boolean application;
     @XmlElementWrapper(required = true)
     @XmlElement(name = "componentDistributionInfo", namespace = "http://www.meta-share.org/OMTD-SHARE_XMLSchema")
     protected List<ComponentDistributionInfo> distributionInfos;
+    @XmlElementWrapper
+    @XmlElement(name = "parameterInfo", namespace = "http://www.meta-share.org/OMTD-SHARE_XMLSchema")
+    protected List<ParameterInfoType> parameterInfos;
     protected ProcessingResourceInfo inputContentResourceInfo;
     protected ProcessingResourceInfo outputResourceInfo;
     protected ComponentDependencies componentDependencies;
@@ -255,10 +267,10 @@ public class ComponentInfo {
      * 
      * @return
      *     possible object is
-     *     {@link String }
+     *     {@link ResourceTypeEnum }
      *     
      */
-    public String getResourceType() {
+    public ResourceTypeEnum getResourceType() {
         return resourceType;
     }
 
@@ -267,10 +279,10 @@ public class ComponentInfo {
      * 
      * @param value
      *     allowed object is
-     *     {@link String }
+     *     {@link ResourceTypeEnum }
      *     
      */
-    public void setResourceType(String value) {
+    public void setResourceType(ResourceTypeEnum value) {
         this.resourceType = value;
     }
 
@@ -416,6 +428,30 @@ public class ComponentInfo {
      */
     public void setResourceCreationInfo(ResourceCreationInfo value) {
         this.resourceCreationInfo = value;
+    }
+
+    /**
+     * Gets the value of the application property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isApplication() {
+        return application;
+    }
+
+    /**
+     * Sets the value of the application property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setApplication(Boolean value) {
+        this.application = value;
     }
 
     /**
@@ -593,6 +629,17 @@ public class ComponentInfo {
 
     public void setDistributionInfos(List<ComponentDistributionInfo> distributionInfos) {
         this.distributionInfos = distributionInfos;
+    }
+
+    public List<ParameterInfoType> getParameterInfos() {
+        if (parameterInfos == null) {
+            parameterInfos = new ArrayList<ParameterInfoType>();
+        }
+        return parameterInfos;
+    }
+
+    public void setParameterInfos(List<ParameterInfoType> parameterInfos) {
+        this.parameterInfos = parameterInfos;
     }
 
 }
